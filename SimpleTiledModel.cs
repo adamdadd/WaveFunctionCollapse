@@ -40,11 +40,11 @@ class SimpleTiledModel : Model
 		Color[] tile (Func<int, int, Color> f)
 		{
 			Color[] result = new Color[tilesize * tilesize];
-			for (int y = 0; y < tilesize; y++) for (int x = 0; x < tilesize; x++) result[x + y * tilesize] = f(x, y);
+			for (int y = 0; y < tilesize; y++) for (int x = 0; x < tilesize; x++) result[(x + y * tilesize)] = f(x, y);
 			return result;
-		};
+		}
 
-		Color[] rotate(Color[] array) => tile((x, y) => array[tilesize - 1 - y + x * tilesize]);
+		Color[] rotate(Color[] array) => tile((x, y) => array[(tilesize - 1 - y + x * tilesize)]);
 
 		tiles = new List<Color[]>();
 		tilenames = new List<string>();
@@ -210,11 +210,11 @@ class SimpleTiledModel : Model
 		{
 			for (int x = 0; x < FMX; x++) for (int y = 0; y < FMY; y++)
 					{
-						Color[] tile = tiles[observed[x + y * FMX]];
+						Color[] tile = tiles[observed[(x + y * FMX)]];
 						for (int yt = 0; yt < tilesize; yt++) for (int xt = 0; xt < tilesize; xt++)
 							{
-								Color c = tile[xt + yt * tilesize];
-								bitmapData[x * tilesize + xt + (y * tilesize + yt) * FMX * tilesize] =
+								Color c = tile[(xt + yt * tilesize)];
+								bitmapData[(x * tilesize + xt + (y * tilesize + yt) * FMX * tilesize)] =
 									unchecked((int)0xff000000 | (c.R << 16) | (c.G << 8) | c.B);
 							}
 					}
@@ -223,25 +223,25 @@ class SimpleTiledModel : Model
 		{
 			for (int x = 0; x < FMX; x++) for (int y = 0; y < FMY; y++)
 				{
-					bool[] a = wave[x + y * FMX];
+					bool[] a = wave[(x + y * FMX)];
 					int amount = (from b in a where b select 1).Sum();
 					double lambda = 1.0 / (from t in Enumerable.Range(0, T) where a[t] select weights[t]).Sum();
 
 					for (int yt = 0; yt < tilesize; yt++) for (int xt = 0; xt < tilesize; xt++)
 						{
-							if (black && amount == T) bitmapData[x * tilesize + xt + (y * tilesize + yt) * FMX * tilesize] = unchecked((int)0xff000000);
+							if (black && amount == T) bitmapData[(x * tilesize + xt + (y * tilesize + yt) * FMX * tilesize)] = unchecked((int)0xff000000);
 							else
 							{
 								double r = 0, g = 0, b = 0;
 								for (int t = 0; t < T; t++) if (a[t])
 									{
-										Color c = tiles[t][xt + yt * tilesize];
+										Color c = tiles[t][(xt + yt * tilesize)];
 										r += (double)c.R * weights[t] * lambda;
 										g += (double)c.G * weights[t] * lambda;
 										b += (double)c.B * weights[t] * lambda;
 									}
 
-								bitmapData[x * tilesize + xt + (y * tilesize + yt) * FMX * tilesize] =
+								bitmapData[(x * tilesize + xt + (y * tilesize + yt) * FMX * tilesize)] =
 									unchecked((int)0xff000000 | ((int)r << 16) | ((int)g << 8) | (int)b);
 							}
 						}
